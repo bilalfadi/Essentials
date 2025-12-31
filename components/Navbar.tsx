@@ -13,14 +13,12 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/store' },
-    { name: 'Hoodie', href: '/hoodies' },
-    { name: 'T-Shirt', href: '/t-shirts' },
     { name: 'Tracksuits', href: '/tracksuits' },
-    { name: 'Sweatpants', href: '/sweatpants' },
-    { name: 'Shorts', href: '/shorts' },
     { name: 'Jackets', href: '/jackets' },
-    { name: 'Beanies', href: '/beanies' },
-    { name: 'Hats', href: '/hats' },
+    { name: 'Shorts', href: '/shorts' },
+    { name: 'T-Shirt', href: '/t-shirts' },
+    { name: 'Bags', href: '/bags' },
+    { name: 'Hoodie', href: '/hoodies' },
   ]
 
   return (
@@ -30,7 +28,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-white text-xl font-semibold">
-              Hellstar Studio
+              Trapstar Official
             </Link>
           </div>
 

@@ -53,7 +53,7 @@ export default function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           <div>
             <h3 className="text-xl font-bold text-white mb-4">{product.title}</h3>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              <strong>Hellstar T-Shirt</strong> is understood for its numerous series of captivating designs. Wearers can express their individuality effortlessly due to each T-shirt's carefully crafted visible appeal and unique design. No matter your flavor, <strong>Hellstar</strong> has a pattern or layout to fit all of us.
+              <strong>Trapstar T-Shirt</strong> is understood for its numerous series of captivating designs. Wearers can express their individuality effortlessly due to each T-shirt's carefully crafted visible appeal and unique design. No matter your flavor, <strong>Trapstar</strong> has a pattern or layout to fit all of us.
             </p>
             
             <h4 className="text-lg font-semibold text-white mb-3">Specifications:</h4>
@@ -68,8 +68,8 @@ export default function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
             <h4 className="text-lg font-semibold text-white mb-3">Recommended Products:</h4>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Hellstar Future Shirt</li>
-              <li>Hellstar Jesus Emblem T-Shirt</li>
+              <li>Trapstar Future Shirt</li>
+              <li>Trapstar Jesus Emblem T-Shirt</li>
             </ul>
           </div>
         )}

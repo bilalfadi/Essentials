@@ -4,8 +4,8 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Fashion Store - Premium Streetwear',
-  description: 'Modern fashion e-commerce store',
+  title: 'Trapstar Official - Premium Streetwear',
+  description: 'Trapstar Official - Premium Streetwear Collection',
 }
 
 export default function RootLayout({

@@ -117,10 +117,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
+        {/* Footer Bottom */}
         <div className="mt-8 pt-8 border-t border-gray-900">
           <p className="text-gray-400 text-sm text-center">
-            Hellstar Studio © All Rights Reserved {new Date().getFullYear()}
+            Trapstar Official {new Date().getFullYear()} - Premium Streetwear Collection
           </p>
         </div>
       </div>

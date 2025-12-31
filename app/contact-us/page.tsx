@@ -19,7 +19,7 @@ export default function ContactUs() {
             </div>
             <div>
               <h3 className="text-white font-medium mb-2">Email</h3>
-              <p className="text-gray-400">support@hellstarstudio.com</p>
+              <p className="text-gray-400">support@trapstarofficial.store</p>
             </div>
           </div>
         </div>

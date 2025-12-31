@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read CSV file
-const csvPath = path.join(__dirname, '..', 'data', 'products.csv');
+// Read CSV files
+const csvPath1 = path.join(__dirname, '..', 'data', 'products.csv');
+const csvPath2 = path.join(__dirname, '..', 'data', '1.csv');
+const csvPath3 = path.join(__dirname, '..', 'data', 'trapstar.csv');
 const jsonPath = path.join(__dirname, '..', 'data', 'products.json');
 const bilalPath = path.join(__dirname, '..', 'public', 'bilal');
 
@@ -61,8 +63,20 @@ function findImage(productName, imageFiles) {
 const imageFiles = getAllImages();
 console.log(`📁 Found ${imageFiles.length} images in bilal folder`);
 
-const csvContent = fs.readFileSync(csvPath, 'utf-8');
-const lines = csvContent.split('\n').filter(line => line.trim());
+// Read all CSV files
+const allCsvContent = [];
+if (fs.existsSync(csvPath1)) {
+  allCsvContent.push(fs.readFileSync(csvPath1, 'utf-8'));
+}
+if (fs.existsSync(csvPath2)) {
+  allCsvContent.push(fs.readFileSync(csvPath2, 'utf-8'));
+}
+if (fs.existsSync(csvPath3)) {
+  allCsvContent.push(fs.readFileSync(csvPath3, 'utf-8'));
+}
+
+const combinedContent = allCsvContent.join('\n');
+const lines = combinedContent.split('\n').filter(line => line.trim());
 
 // Get headers
 const headers = lines[0].split(',').map(h => h.trim());
@@ -118,38 +132,91 @@ for (let i = 1; i < lines.length; i++) {
         .replace(/(^-|-$)/g, '');
       
       // Map category
-      let category = (row.category || '').toLowerCase();
-      if (category.includes('hoodie')) category = 'hoodies';
-      else if (category.includes('shirt') || category.includes('t-shirt')) category = 't-shirts';
-      else if (category.includes('tracksuit')) category = 'tracksuits';
-      else if (category.includes('sweatpant')) category = 'sweatpants';
-      else if (category.includes('short')) category = 'shorts';
-      else if (category.includes('jacket')) category = 'jackets';
-      else if (category.includes('jean')) category = 'jeans';
-      else if (category.includes('beanie')) category = 'beanies';
-      else if (category.includes('hat')) category = 'hats';
-      else if (category.includes('ski mask')) category = 'ski-masks';
-      else if (category.includes('long sleeve')) category = 'long-sleeves';
-      else if (category.includes('sweater')) category = 'sweaters';
-      else if (category.includes('pant') && !category.includes('sweat')) category = 'pants';
-      else if (category === 'uncategorized') category = 'hoodies'; // default uncategorized to hoodies
-      else category = 'hoodies'; // default
+      let category = (row.category || '').trim().toLowerCase();
+      const titleLower = title.toLowerCase();
       
-      // Parse prices (remove $ and commas)
-      const priceStr = (row.original_price || row.price || '').replace(/[$,]/g, '');
-      const discountPriceStr = (row.price || '').replace(/[$,]/g, '');
+      // Check title for category hints (for Trapstar products)
+      // Map CSV categories to our category system
+      // Order matters - check specific matches first
+      if (category === 'tracksuits' || category.includes('tracksuit')) {
+        category = 'tracksuits';
+      } else if (category === 'short sets' || category === 'short set' || category.includes('short set')) {
+        category = 'shorts';
+      } else if (category === 'bags' || category === 'bag' || category.includes('bag')) {
+        category = 'bags';
+      } else if (category === 'jackets' || category === 'jacket' || category.includes('jacket')) {
+        category = 'jackets';
+      } else if (category === 't-shirts' || category === 't shirts' || category === 't-shirt' || category.includes('t-shirt') || (category.includes('shirt') && !category.includes('short'))) {
+        category = 't-shirts';
+      } else if (category === 'hoodies' || category === 'hoodie' || category.includes('hoodie')) {
+        category = 'hoodies';
+      } else if (titleLower.includes('tracksuit')) {
+        category = 'tracksuits';
+      } else if (titleLower.includes('short set') || titleLower.includes('shorts')) {
+        category = 'shorts';
+      } else if (titleLower.includes('puffer jacket') || titleLower.includes('windbreaker') || titleLower.includes('jacket')) {
+        category = 'jackets';
+      } else if (titleLower.includes('bag')) {
+        category = 'bags';
+      } else if (titleLower.includes('central cee')) {
+        category = 'collaborations';
+      } else if (category.includes('sweatpant')) {
+        category = 'sweatpants';
+      } else if (category.includes('short') && !category.includes('short set')) {
+        category = 'shorts';
+      } else if (category.includes('jean')) {
+        category = 'jeans';
+      } else if (category.includes('beanie')) {
+        category = 'beanies';
+      } else if (category.includes('hat')) {
+        category = 'hats';
+      } else if (category.includes('ski mask')) {
+        category = 'ski-masks';
+      } else if (category.includes('long sleeve')) {
+        category = 'long-sleeves';
+      } else if (category.includes('sweater')) {
+        category = 'sweaters';
+      } else if (category.includes('pant') && !category.includes('sweat')) {
+        category = 'pants';
+      } else if (category === 'uncategorized' || category === 'trapstar' || !category) {
+        // Try to infer from title
+        if (titleLower.includes('hoodie')) {
+          category = 'hoodies';
+        } else if (titleLower.includes('t-shirt') || titleLower.includes('tee')) {
+          category = 't-shirts';
+        } else if (titleLower.includes('jacket')) {
+          category = 'jackets';
+        } else if (titleLower.includes('bag')) {
+          category = 'bags';
+        } else if (titleLower.includes('short set') || titleLower.includes('shorts')) {
+          category = 'shorts';
+        } else {
+          category = 'hoodies'; // default
+        }
+      } else {
+        category = 'hoodies'; // default
+      }
+      
+      // Parse prices (remove £, $ and commas)
+      const priceStr = (row.original_price || row.price || '').replace(/[£$,]/g, '');
+      const discountPriceStr = (row.price || '').replace(/[£$,]/g, '');
       
       const price = priceStr ? parseFloat(priceStr) : 299.99;
       const discountPrice = discountPriceStr && discountPriceStr !== priceStr ? parseFloat(discountPriceStr) : null;
       
-      // Find matching local image
+      // Find matching local image or use image_url
       const localImage = findImage(title, imageFiles);
+      const imagePath = localImage || row.image_url || '';
       
-      // Only add product if it has a local image
-      if (!localImage) {
-        console.log(`⚠️  Skipping "${title}" - no local image found`);
+      // For Trapstar products, allow image_url if no local image
+      const isTrapstar = title.toLowerCase().includes('trapstar') || (row.brand || '').toLowerCase().includes('trapstar');
+      if (!localImage && !imagePath && !isTrapstar) {
+        console.log(`⚠️  Skipping "${title}" - no image found`);
         continue;
       }
+      
+      // Determine brand
+      const brand = (row.brand || '').trim() || (titleLower.includes('trapstar') ? 'Trapstar' : 'Hellstar');
       
       const product = {
         id: products.length + 1,
@@ -158,8 +225,9 @@ for (let i = 1; i < lines.length; i++) {
         category: category,
         price: price,
         discountPrice: discountPrice,
-        image: localImage,
-        description: row.description || title
+        image: imagePath,
+        description: row.description || title,
+        brand: brand
       };
       
       products.push(product);
@@ -180,12 +248,33 @@ console.log(`✅ Saved to: ${jsonPath}`);
 
 // Show summary
 const byCategory = {};
+const byBrand = {};
 products.forEach(p => {
   byCategory[p.category] = (byCategory[p.category] || 0) + 1;
+  byBrand[p.brand] = (byBrand[p.brand] || 0) + 1;
 });
 
 console.log('\n📊 By category:');
-Object.entries(byCategory).forEach(([cat, count]) => {
+Object.entries(byCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
   console.log(`  ${cat}: ${count}`);
 });
+
+console.log('\n🏷️  By brand:');
+Object.entries(byBrand).forEach(([brand, count]) => {
+  console.log(`  ${brand}: ${count}`);
+});
+
+// Show Trapstar categories specifically
+const trapstarProducts = products.filter(p => p.brand === 'Trapstar');
+const trapstarByCategory = {};
+trapstarProducts.forEach(p => {
+  trapstarByCategory[p.category] = (trapstarByCategory[p.category] || 0) + 1;
+});
+
+if (trapstarProducts.length > 0) {
+  console.log('\n⭐ Trapstar products by category:');
+  Object.entries(trapstarByCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
+    console.log(`  ${cat}: ${count}`);
+  });
+}
 
