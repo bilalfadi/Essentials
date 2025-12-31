@@ -1,0 +1,62 @@
+'use client'
+
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { searchProducts } from '@/lib/products'
+import ProductGrid from '@/components/ProductGrid'
+import type { Product } from '@/lib/products'
+
+function SearchContent() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q') || ''
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    if (query) {
+      const results = searchProducts(query)
+      setProducts(results)
+    } else {
+      setProducts([])
+    }
+  }, [query])
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold text-white mb-4">
+          {query ? `Search Results for "${query}"` : 'Search Products'}
+        </h1>
+        {query && (
+          <p className="text-gray-400">
+            {products.length} {products.length === 1 ? 'product' : 'products'} found
+          </p>
+        )}
+        {!query && (
+          <p className="text-gray-400">Enter a search term to find products</p>
+        )}
+      </div>
+      {query ? (
+        <ProductGrid products={products} />
+      ) : (
+        <div className="text-center py-20">
+          <p className="text-gray-400 text-lg">Start typing to search for products</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center py-20">
+          <p className="text-gray-400 text-lg">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
+  )
+}
+
