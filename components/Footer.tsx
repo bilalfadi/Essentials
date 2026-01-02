@@ -49,6 +49,16 @@ export default function Footer() {
                   Shorts
                 </Link>
               </li>
+              <li>
+                <Link href="/sweatshirts" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Sweatshirts
+                </Link>
+              </li>
+              <li>
+                <Link href="/pants" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Pants
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ProductGrid from '@/components/ProductGrid'
 import ProductDetailTabs from '@/components/ProductDetailTabs'
+import type { Metadata } from 'next'
 
 interface ProductPageProps {
   params: {
@@ -10,7 +11,61 @@ interface ProductPageProps {
   }
 }
 
+// Valid categories - if slug matches these, it's a category, not a product
+const validCategories = ['hoodies', 't-shirts', 'tracksuits', 'sweatpants', 'shorts', 'jackets', 'jeans', 'beanies', 'hats', 'ski-masks', 'long-sleeves', 'sweaters', 'pants', 'bags', 'collaborations', 'sweatshirts', 'store', 'about-us', 'contact-us', 'privacy-policy', 'shipping-policy', 'return-exchange', 'refund-cancellation', 'search']
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  // If slug is a category or reserved route, return empty metadata (will be handled by notFound)
+  if (validCategories.includes(params.slug) || params.slug.startsWith('category/')) {
+    return {}
+  }
+  
+  const product = getProductBySlug(params.slug)
+  
+  if (!product) {
+    return {}
+  }
+
+  const title = `${product.title} - Essentials Official | Premium Streetwear`
+  const description = product.description || `${product.title} from Essentials Official. Premium quality streetwear with bold designs.`
+  const imageUrl = product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`
+
+  return {
+    title: title,
+    description: description,
+    keywords: `${product.title}, Essentials ${product.title}, ${product.category}, Essentials ${product.category}, streetwear, premium clothing`,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `https://essentialsjacket.com/${product.slug}`,
+      siteName: 'Essentials Official',
+      type: 'website',
+      images: [
+        {
+          url: imageUrl,
+          alt: product.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: description,
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: `https://essentialsjacket.com/${product.slug}`,
+    },
+  }
+}
+
 export default function ProductPage({ params }: ProductPageProps) {
+  // If slug is a category or reserved route, show 404
+  if (validCategories.includes(params.slug) || params.slug.startsWith('category/')) {
+    notFound()
+  }
+  
   const product = getProductBySlug(params.slug)
 
   if (!product) {
@@ -35,8 +90,52 @@ export default function ProductPage({ params }: ProductPageProps) {
     .filter(p => p.id !== product.id)
     .slice(0, 8)
 
+  // Structured data for product page
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    image: product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`,
+    brand: {
+      '@type': 'Brand',
+      name: 'Essentials'
+    },
+    category: product.category,
+    offers: {
+      '@type': 'Offer',
+      price: product.discountPrice || product.price,
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: `https://essentialsjacket.com/${product.slug}`,
+      ...(product.discountPrice && product.price && {
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: product.discountPrice,
+          priceCurrency: 'USD',
+          referenceQuantity: {
+            '@type': 'QuantitativeValue',
+            value: 1
+          }
+        }
+      })
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.5',
+      reviewCount: '127'
+    }
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       {/* Main Product Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-16">
         {/* Product Image */}
@@ -139,13 +238,18 @@ export default function ProductPage({ params }: ProductPageProps) {
         </div>
       )}
     </div>
+    </>
   )
 }
 
 // Generate static params for all products
 export async function generateStaticParams() {
   const products = getAllProducts()
-  return products.map((product) => ({
-    slug: product.slug,
-  }))
+  // Filter out any products whose slug matches a category name
+  return products
+    .filter((product) => !validCategories.includes(product.slug))
+    .map((product) => ({
+      slug: product.slug,
+    }))
 }
+

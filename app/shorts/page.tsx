@@ -1,32 +1,37 @@
-import { getProductsByCategory, getProductsByCategoryAndBrand } from '@/lib/products'
+import { getProductsByCategory, getProductsByCategoryAndBrand, getAllProducts } from '@/lib/products'
 import ProductGrid from '@/components/ProductGrid'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 
-interface CategoryPageProps {
-  params: {
-    category: string
-  }
+const category = 'shorts'
+const categoryName = 'Shorts'
+
+// Generate metadata for SEO
+export const metadata: Metadata = {
+  title: `${categoryName} - Essentials Official | Premium Streetwear`,
+  description: `Shop ${categoryName} from Essentials Official. Premium quality ${categoryName.toLowerCase()} with bold streetwear designs.`,
+  keywords: `Essentials ${categoryName}, ${categoryName} Essentials, Essentials ${categoryName} collection, streetwear ${categoryName}, premium ${categoryName}`,
+  openGraph: {
+    title: `${categoryName} - Essentials Official`,
+    description: `Shop ${categoryName} from Essentials Official. Premium quality ${categoryName.toLowerCase()}.`,
+    url: `https://essentialsjacket.com/${category}`,
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${categoryName} - Essentials Official`,
+    description: `Shop ${categoryName} from Essentials Official.`,
+  },
+  alternates: {
+    canonical: `https://essentialsjacket.com/${category}`,
+  },
 }
 
-const validCategories = ['hoodies', 't-shirts', 'tracksuits', 'sweatpants', 'shorts', 'jackets', 'jeans', 'beanies', 'hats', 'ski-masks', 'long-sleeves', 'sweaters', 'pants', 'bags', 'collaborations', 'sweatshirts']
-
-export default function CategoryPage({ params }: CategoryPageProps) {
-  // Use category directly from params (already matches URL)
-  const category = params.category
-
-  if (!validCategories.includes(category)) {
-    notFound()
-  }
-
+export default function CategoryPage() {
   // Get only Essentials products
   const essentialsProducts = getProductsByCategoryAndBrand(category, 'essentials')
   const allProducts = essentialsProducts
-
-  // Format category name for display
-  const categoryName = category
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
 
   // Category-specific descriptions for Essentials
   const categoryDescriptions: Record<string, string> = {
@@ -50,25 +55,65 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   const description = categoryDescriptions[category] || ''
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <div className="mb-8 md:mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 md:mb-4">{categoryName}</h1>
-        <p className="text-gray-400 mb-3 md:mb-6 text-sm md:text-base">{allProducts.length} products available</p>
-      </div>
+  // Structured data for category page
+  const categorySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${categoryName} - Essentials Official`,
+    description: description,
+    url: `https://essentialsjacket.com/${category}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: allProducts.length,
+      itemListElement: allProducts.slice(0, 10).map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Product',
+          name: product.title,
+          url: `https://essentialsjacket.com/${product.slug}`,
+          image: product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`,
+          brand: {
+            '@type': 'Brand',
+            name: 'Essentials'
+          },
+          offers: {
+            '@type': 'Offer',
+            price: product.discountPrice || product.price,
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock'
+          }
+        }
+      }))
+    }
+  }
 
-      {/* Essentials Products Section */}
-      {essentialsProducts.length > 0 && (
-        <section className="mb-16 md:mb-20">
-          <ProductGrid products={essentialsProducts} />
-          {description && (
-            <div className="mt-8">
-              <p className="text-gray-400 max-w-3xl text-sm md:text-base leading-relaxed">{description}</p>
-            </div>
-          )}
-        </section>
-      )}
-    </div>
+  return (
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categorySchema) }}
+      />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 md:mb-4">{categoryName}</h1>
+          <p className="text-gray-400 mb-3 md:mb-6 text-sm md:text-base">{allProducts.length} products available</p>
+        </div>
+
+        {/* Essentials Products Section */}
+        {essentialsProducts.length > 0 && (
+          <section className="mb-16 md:mb-20">
+            <ProductGrid products={essentialsProducts} />
+            {description && (
+              <div className="mt-8">
+                <p className="text-gray-400 max-w-3xl text-sm md:text-base leading-relaxed">{description}</p>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+    </>
   )
 }
-

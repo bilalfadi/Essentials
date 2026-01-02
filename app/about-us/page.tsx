@@ -1,3 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About Us - Essentials Official | Essentials Jacket',
+  description: 'Learn about Essentials Official - Premium streetwear brand combining bold designs with premium quality. Our mission, story, and commitment to quality.',
+  keywords: 'Essentials about us, Essentials brand story, Essentials mission, streetwear brand',
+  openGraph: {
+    title: 'About Us - Essentials Official',
+    description: 'Learn about Essentials Official - Premium streetwear brand.',
+    url: 'https://essentialsjacket.com/about-us',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/about-us',
+  },
+}
+
 export default function AboutUs() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

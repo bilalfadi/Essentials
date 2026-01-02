@@ -1,3 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy - Essentials Official | Essentials Jacket',
+  description: 'Essentials Official Privacy Policy. Learn how we collect, use, and protect your personal information when you shop with us.',
+  keywords: 'Essentials privacy policy, data protection, privacy',
+  openGraph: {
+    title: 'Privacy Policy - Essentials Official',
+    description: 'Essentials Official Privacy Policy.',
+    url: 'https://essentialsjacket.com/privacy-policy',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/privacy-policy',
+  },
+}
+
 export default function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

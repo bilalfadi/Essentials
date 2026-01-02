@@ -1,3 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Refund & Cancellation Policy - Essentials Official | Essentials Jacket',
+  description: 'Essentials Official refund and cancellation policy. Learn about our cancellation process, refund policy, and processing times.',
+  keywords: 'Essentials refund, cancellation policy, refund policy',
+  openGraph: {
+    title: 'Refund & Cancellation Policy - Essentials Official',
+    description: 'Essentials Official refund and cancellation policy.',
+    url: 'https://essentialsjacket.com/refund-cancellation',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/refund-cancellation',
+  },
+}
+
 export default function RefundCancellation() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -1,3 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Return & Exchange Policy - Essentials Official | Essentials Jacket',
+  description: 'Essentials Official return and exchange policy. Learn how to return or exchange items, return conditions, and processing information.',
+  keywords: 'Essentials return, exchange policy, return policy',
+  openGraph: {
+    title: 'Return & Exchange Policy - Essentials Official',
+    description: 'Essentials Official return and exchange policy.',
+    url: 'https://essentialsjacket.com/return-exchange',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/return-exchange',
+  },
+}
+
 export default function ReturnExchange() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

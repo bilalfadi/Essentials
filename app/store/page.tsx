@@ -1,5 +1,22 @@
 import { getAllProducts } from '@/lib/products'
 import ProductGrid from '@/components/ProductGrid'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Shop All Products - Essentials Official | Premium Streetwear',
+  description: 'Browse our complete Essentials collection. Shop hoodies, t-shirts, jackets, tracksuits, sweatpants, shorts, and more. Premium quality streetwear.',
+  keywords: 'Essentials shop, Essentials store, Essentials collection, Essentials products, streetwear shop',
+  openGraph: {
+    title: 'Shop All Products - Essentials Official',
+    description: 'Browse our complete Essentials collection. Shop premium quality streetwear.',
+    url: 'https://essentialsjacket.com/store',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/store',
+  },
+}
 
 export default function StorePage() {
   const allProducts = getAllProducts()

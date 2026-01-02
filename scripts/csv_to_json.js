@@ -4,62 +4,6 @@ const path = require('path');
 // Read CSV files - Use Essentials CSV
 const essentialsCsvPath = path.join(__dirname, '..', 'data', 'essentials.csv');
 const jsonPath = path.join(__dirname, '..', 'data', 'products.json');
-const bilalPath = path.join(__dirname, '..', 'public', 'bilal');
-
-// Get all image files from bilal folder
-function getAllImages() {
-  if (!fs.existsSync(bilalPath)) {
-    return [];
-  }
-  return fs.readdirSync(bilalPath).filter(file => {
-    const ext = path.extname(file).toLowerCase();
-    return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
-  });
-}
-
-// Find matching image for product name
-function findImage(productName, imageFiles) {
-  // Normalize product name: remove special chars, convert to lowercase
-  const normalized = productName
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, '_');
-  
-  // Try exact match first
-  for (const file of imageFiles) {
-    const fileBase = path.basename(file, path.extname(file))
-      .toLowerCase()
-      .replace(/[^a-z0-9_]/g, '_');
-    
-    if (fileBase === normalized || fileBase.includes(normalized) || normalized.includes(fileBase)) {
-      return `/bilal/${file}`;
-    }
-  }
-  
-  // Try partial match
-  const nameWords = normalized.split('_').filter(w => w.length > 3);
-  for (const file of imageFiles) {
-    const fileBase = path.basename(file, path.extname(file))
-      .toLowerCase()
-      .replace(/[^a-z0-9_]/g, '_');
-    
-    let matchCount = 0;
-    for (const word of nameWords) {
-      if (fileBase.includes(word)) {
-        matchCount++;
-      }
-    }
-    
-    if (matchCount >= Math.min(3, nameWords.length)) {
-      return `/bilal/${file}`;
-    }
-  }
-  
-  return null;
-}
-
-const imageFiles = getAllImages();
-console.log(`📁 Found ${imageFiles.length} images in bilal folder`);
 
 // Read Essentials CSV file
 const allCsvContent = [];
@@ -246,15 +190,12 @@ for (let i = 1; i < lines.length; i++) {
       const price = (parsedPrice && !isNaN(parsedPrice) && parsedPrice > 0) ? parsedPrice : 299.99;
       const discountPrice = (parsedDiscountPrice && !isNaN(parsedDiscountPrice) && parsedDiscountPrice > 0) ? parsedDiscountPrice : null;
       
-      // Find matching local image from bilal folder (prefer local images)
-      // Use cleaned title for image matching, but also try raw title as fallback
-      const localImage = findImage(cleanTitle, imageFiles) || findImage(rawTitle, imageFiles);
-      const imagePath = localImage || row.image_url || '';
+      // Use only remote image URL from CSV - no local images
+      const imagePath = (row.image_url || '').trim();
       
-      // For Essentials products, use local images if available, otherwise use image_url
-      // Don't skip if no local image - use image_url as fallback
-      if (!localImage && !row.image_url) {
-        console.log(`⚠️  Skipping "${title}" - no image found`);
+      // Skip if no remote image URL
+      if (!imagePath || !imagePath.startsWith('http')) {
+        console.log(`⚠️  Skipping "${title}" - no remote image URL found`);
         continue;
       }
       
@@ -280,9 +221,9 @@ for (let i = 1; i < lines.length; i++) {
 
 console.log(`\n✅ Parsed ${products.length} products`);
 
-// Count matched images
-const matchedImages = products.filter(p => p.image.startsWith('/bilal/')).length;
-console.log(`🖼️  Matched ${matchedImages} local images`);
+// Count remote images
+const remoteImages = products.filter(p => p.image.startsWith('http')).length;
+console.log(`🖼️  Using ${remoteImages} remote images`);
 
 // Save to JSON
 fs.writeFileSync(jsonPath, JSON.stringify(products, null, 2));

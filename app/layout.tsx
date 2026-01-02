@@ -4,11 +4,37 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Essentials Official - Premium Streetwear',
-  description: 'Essentials Official - Premium Streetwear Collection',
+  title: 'Essentials Official - Premium Streetwear | Essentials Jacket',
+  description: 'Essentials Official - Premium Streetwear Collection. Shop Essentials hoodies, t-shirts, jackets, tracksuits, and more at essentialsjacket.com',
   metadataBase: new URL('https://essentialsjacket.com'),
   alternates: {
-    canonical: '/',
+    canonical: 'https://essentialsjacket.com/',
+  },
+  icons: {
+    icon: [
+      { url: '/Essentials.jpeg', sizes: 'any' },
+    ],
+    shortcut: '/Essentials.jpeg',
+    apple: '/Essentials.jpeg',
+  },
+  openGraph: {
+    title: 'Essentials Official - Premium Streetwear',
+    description: 'Essentials Official - Premium Streetwear Collection',
+    url: 'https://essentialsjacket.com',
+    siteName: 'Essentials Official',
+    type: 'website',
+    images: [
+      {
+        url: 'https://essentialsjacket.com/Essentials.jpeg',
+        alt: 'Essentials Official',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Essentials Official - Premium Streetwear',
+    description: 'Essentials Official - Premium Streetwear Collection',
+    images: ['https://essentialsjacket.com/Essentials.jpeg'],
   },
 }
 

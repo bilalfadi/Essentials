@@ -1,3 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Contact Us - Essentials Official | Essentials Jacket',
+  description: 'Contact Essentials Official. Get in touch with us for questions, support, or inquiries. Warehouse address and customer service information.',
+  keywords: 'Essentials contact, Essentials customer service, Essentials support, contact Essentials',
+  openGraph: {
+    title: 'Contact Us - Essentials Official',
+    description: 'Contact Essentials Official for questions and support.',
+    url: 'https://essentialsjacket.com/contact-us',
+    siteName: 'Essentials Official',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://essentialsjacket.com/contact-us',
+  },
+}
+
 export default function ContactUs() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -19,7 +37,7 @@ export default function ContactUs() {
             </div>
             <div>
               <h3 className="text-white font-medium mb-2">Email</h3>
-              <p className="text-gray-400">support@trapstarofficial.store</p>
+              <p className="text-gray-400">support@essentialsclothing.us</p>
             </div>
           </div>
         </div>
