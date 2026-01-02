@@ -32,6 +32,11 @@ const nextConfig = {
         hostname: 'via.placeholder.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'essentialclothingco.us.com',
+        pathname: '/**',
+      },
     ],
   },
 }

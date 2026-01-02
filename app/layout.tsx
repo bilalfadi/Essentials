@@ -6,6 +6,10 @@ import Footer from '@/components/Footer'
 export const metadata: Metadata = {
   title: 'Essentials Official - Premium Streetwear',
   description: 'Essentials Official - Premium Streetwear Collection',
+  metadataBase: new URL('https://essentialsjacket.com'),
+  alternates: {
+    canonical: '/',
+  },
 }
 
 export default function RootLayout({

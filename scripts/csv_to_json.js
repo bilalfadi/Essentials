@@ -115,18 +115,72 @@ for (let i = 1; i < lines.length; i++) {
     // Only process if has name
     if (row.name && row.name.trim()) {
       // Map CSV columns to our JSON format
-      const title = row.name.trim();
+      let rawTitle = row.name.trim();
       
-      // Generate slug from title
-      const slug = title
+      // Clean the title - remove all the extra e-commerce text
+      // Remove patterns like: "Add to wishlist", "Original price was", "Current price is", "Select options", "Compare", "Quick view", etc.
+      let cleanTitle = rawTitle
+        .replace(/^-\d+%\s*/i, '') // Remove leading discount percentage
+        .replace(/add\s+to\s+wishlist/gi, '')
+        .replace(/original\s+price\s+was[^.]*\./gi, '')
+        .replace(/current\s+price\s+is[^.]*\./gi, '')
+        .replace(/select\s+options/gi, '')
+        .replace(/compare/gi, '')
+        .replace(/quick\s+view/gi, '')
+        .replace(/\$\d+\.\d+/g, '') // Remove price strings like $200.00
+        .replace(/\$\d+/g, '') // Remove price strings like $200
+        .replace(/new\s+collection/gi, '')
+        .replace(/fear\s+of\s+god/gi, '')
+        .replace(/00\.\./g, '') // Remove "00.." artifacts
+        .replace(/,\s*,/g, ',') // Remove double commas
+        .replace(/,\s*$/g, '') // Remove trailing commas
+        .replace(/^\s*,\s*/g, '') // Remove leading commas
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/\s*,\s*/g, ' ') // Replace commas with spaces
+        .trim();
+      
+      // If cleaned title is too short or empty, try to extract product name from original
+      // Look for patterns like "Essentials [Product Name]" or extract first meaningful part
+      if (cleanTitle.length < 10) {
+        // Try to find product name after "Essentials" or before first price
+        const essentialsMatch = rawTitle.match(/essentials\s+([^$]+?)(?:\s*\$|\s*new|$)/i);
+        if (essentialsMatch && essentialsMatch[1]) {
+          cleanTitle = 'Essentials ' + essentialsMatch[1].trim();
+        } else {
+          // Fallback: take first 80 characters and clean
+          cleanTitle = rawTitle.substring(0, 80)
+            .replace(/^-\d+%\s*/i, '')
+            .replace(/add\s+to\s+wishlist/gi, '')
+            .replace(/\$\d+\.\d+/g, '')
+            .trim();
+        }
+      }
+      
+      // Limit title length to 100 characters
+      if (cleanTitle.length > 100) {
+        cleanTitle = cleanTitle.substring(0, 97) + '...';
+      }
+      
+      // Generate slug from cleaned title (max 100 characters for filename safety)
+      let slug = cleanTitle
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+        .replace(/[^a-z0-9\s]+/g, '') // Remove special characters first
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
+      
+      // Limit slug length to 100 characters to prevent ENAMETOOLONG errors
+      if (slug.length > 100) {
+        slug = slug.substring(0, 100).replace(/-$/, ''); // Remove trailing hyphen if cut mid-word
+      }
+      
+      // Use cleaned title for product
+      const title = cleanTitle;
       
       // Map category for Essentials products
       // Since CSV category column has "Essentials" (brand), infer from title
       let category = (row.category || '').trim().toLowerCase();
-      const titleLower = title.toLowerCase();
+      const titleLower = cleanTitle.toLowerCase();
       
       // First try to infer from title (more reliable)
       if (titleLower.includes('tracksuit')) {
@@ -193,7 +247,8 @@ for (let i = 1; i < lines.length; i++) {
       const discountPrice = (parsedDiscountPrice && !isNaN(parsedDiscountPrice) && parsedDiscountPrice > 0) ? parsedDiscountPrice : null;
       
       // Find matching local image from bilal folder (prefer local images)
-      const localImage = findImage(title, imageFiles);
+      // Use cleaned title for image matching, but also try raw title as fallback
+      const localImage = findImage(cleanTitle, imageFiles) || findImage(rawTitle, imageFiles);
       const imagePath = localImage || row.image_url || '';
       
       // For Essentials products, use local images if available, otherwise use image_url
