@@ -120,7 +120,7 @@ export default function Footer() {
         {/* Footer Bottom */}
         <div className="mt-8 pt-8 border-t border-gray-900">
           <p className="text-gray-400 text-sm text-center">
-            Trapstar Official {new Date().getFullYear()} - Premium Streetwear Collection
+            Essentials Official {new Date().getFullYear()} - Premium Streetwear Collection
           </p>
         </div>
       </div>

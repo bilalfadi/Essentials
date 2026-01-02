@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read CSV files
-const csvPath1 = path.join(__dirname, '..', 'data', 'products.csv');
-const csvPath2 = path.join(__dirname, '..', 'data', '1.csv');
-const csvPath3 = path.join(__dirname, '..', 'data', 'trapstar.csv');
+// Read CSV files - Use Essentials CSV
+const essentialsCsvPath = path.join(__dirname, '..', 'data', 'essentials.csv');
 const jsonPath = path.join(__dirname, '..', 'data', 'products.json');
 const bilalPath = path.join(__dirname, '..', 'public', 'bilal');
 
@@ -63,16 +61,10 @@ function findImage(productName, imageFiles) {
 const imageFiles = getAllImages();
 console.log(`📁 Found ${imageFiles.length} images in bilal folder`);
 
-// Read all CSV files
+// Read Essentials CSV file
 const allCsvContent = [];
-if (fs.existsSync(csvPath1)) {
-  allCsvContent.push(fs.readFileSync(csvPath1, 'utf-8'));
-}
-if (fs.existsSync(csvPath2)) {
-  allCsvContent.push(fs.readFileSync(csvPath2, 'utf-8'));
-}
-if (fs.existsSync(csvPath3)) {
-  allCsvContent.push(fs.readFileSync(csvPath3, 'utf-8'));
+if (fs.existsSync(essentialsCsvPath)) {
+  allCsvContent.push(fs.readFileSync(essentialsCsvPath, 'utf-8'));
 }
 
 const combinedContent = allCsvContent.join('\n');
@@ -131,70 +123,61 @@ for (let i = 1; i < lines.length; i++) {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
       
-      // Map category
+      // Map category for Essentials products
+      // Since CSV category column has "Essentials" (brand), infer from title
       let category = (row.category || '').trim().toLowerCase();
       const titleLower = title.toLowerCase();
       
-      // Check title for category hints (for Trapstar products)
-      // Map CSV categories to our category system
-      // Order matters - check specific matches first
-      if (category === 'tracksuits' || category.includes('tracksuit')) {
+      // First try to infer from title (more reliable)
+      if (titleLower.includes('tracksuit')) {
         category = 'tracksuits';
-      } else if (category === 'short sets' || category === 'short set' || category.includes('short set')) {
-        category = 'shorts';
-      } else if (category === 'bags' || category === 'bag' || category.includes('bag')) {
-        category = 'bags';
-      } else if (category === 'jackets' || category === 'jacket' || category.includes('jacket')) {
-        category = 'jackets';
-      } else if (category === 't-shirts' || category === 't shirts' || category === 't-shirt' || category.includes('t-shirt') || (category.includes('shirt') && !category.includes('short'))) {
-        category = 't-shirts';
-      } else if (category === 'hoodies' || category === 'hoodie' || category.includes('hoodie')) {
-        category = 'hoodies';
-      } else if (titleLower.includes('tracksuit')) {
-        category = 'tracksuits';
-      } else if (titleLower.includes('short set') || titleLower.includes('shorts')) {
-        category = 'shorts';
-      } else if (titleLower.includes('puffer jacket') || titleLower.includes('windbreaker') || titleLower.includes('jacket')) {
-        category = 'jackets';
-      } else if (titleLower.includes('bag')) {
-        category = 'bags';
-      } else if (titleLower.includes('central cee')) {
-        category = 'collaborations';
-      } else if (category.includes('sweatpant')) {
+      } else if (titleLower.includes('sweatpant') || titleLower.includes('sweat pant')) {
         category = 'sweatpants';
-      } else if (category.includes('short') && !category.includes('short set')) {
+      } else if (titleLower.includes('short') && !titleLower.includes('sleeve')) {
         category = 'shorts';
-      } else if (category.includes('jean')) {
-        category = 'jeans';
-      } else if (category.includes('beanie')) {
-        category = 'beanies';
-      } else if (category.includes('hat')) {
-        category = 'hats';
-      } else if (category.includes('ski mask')) {
-        category = 'ski-masks';
-      } else if (category.includes('long sleeve')) {
-        category = 'long-sleeves';
-      } else if (category.includes('sweater')) {
+      } else if (titleLower.includes('jacket') || titleLower.includes('parka') || titleLower.includes('coat')) {
+        category = 'jackets';
+      } else if (titleLower.includes('hoodie')) {
+        category = 'hoodies';
+      } else if (titleLower.includes('sweatshirt') || titleLower.includes('sweat shirt') || titleLower.includes('crewneck')) {
+        category = 'sweatshirts';
+      } else if (titleLower.includes('sweater')) {
         category = 'sweaters';
-      } else if (category.includes('pant') && !category.includes('sweat')) {
+      } else if (titleLower.includes('t-shirt') || titleLower.includes('tee') || titleLower.includes('shirt') && !titleLower.includes('sweat')) {
+        category = 't-shirts';
+      } else if (titleLower.includes('long sleeve') || titleLower.includes('long-sleeve')) {
+        category = 'long-sleeves';
+      } else if (titleLower.includes('pant') && !titleLower.includes('sweat')) {
         category = 'pants';
-      } else if (category === 'uncategorized' || category === 'trapstar' || !category) {
-        // Try to infer from title
-        if (titleLower.includes('hoodie')) {
-          category = 'hoodies';
-        } else if (titleLower.includes('t-shirt') || titleLower.includes('tee')) {
-          category = 't-shirts';
-        } else if (titleLower.includes('jacket')) {
-          category = 'jackets';
-        } else if (titleLower.includes('bag')) {
-          category = 'bags';
-        } else if (titleLower.includes('short set') || titleLower.includes('shorts')) {
-          category = 'shorts';
-        } else {
-          category = 'hoodies'; // default
-        }
+      } else if (titleLower.includes('jean')) {
+        category = 'jeans';
+      } else if (titleLower.includes('beanie')) {
+        category = 'beanies';
+      } else if (titleLower.includes('hat') && !titleLower.includes('hoodie')) {
+        category = 'hats';
+      } else if (titleLower.includes('shoe') || titleLower.includes('adilette') || titleLower.includes('lo')) {
+        category = 'shoes';
+      } else if (titleLower.includes('tight') || titleLower.includes('compression')) {
+        category = 'pants';
       } else {
-        category = 'hoodies'; // default
+        // Try category column as fallback
+        if (category === 'tracksuit' || category.includes('tracksuit')) {
+          category = 'tracksuits';
+        } else if (category === 'shorts' || category.includes('short')) {
+          category = 'shorts';
+        } else if (category === 'jacket' || category.includes('jacket')) {
+          category = 'jackets';
+        } else if (category === 'shirt' || category.includes('shirt')) {
+          category = 't-shirts';
+        } else if (category === 'hoodie' || category.includes('hoodie')) {
+          category = 'hoodies';
+        } else if (category === 'sweatshirt' || category.includes('sweatshirt')) {
+          category = 'sweatshirts';
+        } else if (category === 'sweatpants' || category.includes('sweatpant')) {
+          category = 'sweatpants';
+        } else {
+          category = 't-shirts'; // default
+        }
       }
       
       // Parse prices (remove £, $ and commas)
@@ -209,19 +192,19 @@ for (let i = 1; i < lines.length; i++) {
       const price = (parsedPrice && !isNaN(parsedPrice) && parsedPrice > 0) ? parsedPrice : 299.99;
       const discountPrice = (parsedDiscountPrice && !isNaN(parsedDiscountPrice) && parsedDiscountPrice > 0) ? parsedDiscountPrice : null;
       
-      // Find matching local image or use image_url
+      // Find matching local image from bilal folder (prefer local images)
       const localImage = findImage(title, imageFiles);
       const imagePath = localImage || row.image_url || '';
       
-      // For Trapstar products, allow image_url if no local image
-      const isTrapstar = title.toLowerCase().includes('trapstar') || (row.brand || '').toLowerCase().includes('trapstar');
-      if (!localImage && !imagePath && !isTrapstar) {
+      // For Essentials products, use local images if available, otherwise use image_url
+      // Don't skip if no local image - use image_url as fallback
+      if (!localImage && !row.image_url) {
         console.log(`⚠️  Skipping "${title}" - no image found`);
         continue;
       }
       
-      // Determine brand
-      const brand = (row.brand || '').trim() || (titleLower.includes('trapstar') ? 'Trapstar' : 'Hellstar');
+      // Determine brand - use Essentials
+      const brand = (row.brand || '').trim() || 'Essentials';
       
       const product = {
         id: products.length + 1,
@@ -232,7 +215,7 @@ for (let i = 1; i < lines.length; i++) {
         discountPrice: discountPrice,
         image: imagePath,
         description: row.description || title,
-        brand: brand
+        brand: 'Essentials'
       };
       
       products.push(product);
@@ -269,16 +252,16 @@ Object.entries(byBrand).forEach(([brand, count]) => {
   console.log(`  ${brand}: ${count}`);
 });
 
-// Show Trapstar categories specifically
-const trapstarProducts = products.filter(p => p.brand === 'Trapstar');
-const trapstarByCategory = {};
-trapstarProducts.forEach(p => {
-  trapstarByCategory[p.category] = (trapstarByCategory[p.category] || 0) + 1;
+// Show Essentials categories specifically
+const essentialsProducts = products.filter(p => p.brand === 'Essentials');
+const essentialsByCategory = {};
+essentialsProducts.forEach(p => {
+  essentialsByCategory[p.category] = (essentialsByCategory[p.category] || 0) + 1;
 });
 
-if (trapstarProducts.length > 0) {
-  console.log('\n⭐ Trapstar products by category:');
-  Object.entries(trapstarByCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
+if (essentialsProducts.length > 0) {
+  console.log('\n⭐ Essentials products by category:');
+  Object.entries(essentialsByCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
     console.log(`  ${cat}: ${count}`);
   });
 }

@@ -5,7 +5,7 @@ export default function AboutUs() {
       <div className="prose prose-invert max-w-none">
         <div className="text-gray-400 space-y-4">
           <p>
-            Trapstar is an alternative streetwear brand mixing dark, rebellious cyberpunk and Christian-inspired themes. Founded in 2020, we're about "finding stars in hell."
+            Essentials is a streetwear brand that has been making waves in the fashion industry. The brand combines bold designs with premium quality, creating pieces that stand out in the streetwear scene.
           </p>
           <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Our Story</h2>
           <p>

@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-invert max-w-none">
         <div className="text-gray-400 space-y-4">
           <p>
-            At Trapstar Official, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information.
+            At Essentials Official, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information.
           </p>
           <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Information We Collect</h2>
           <p>

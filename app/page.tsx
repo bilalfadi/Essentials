@@ -4,14 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Home() {
-  // Get Trapstar products by category for homepage sections (only categories with Trapstar products)
-  // Order: Tracksuits (31), Jackets (27), Shorts (21), T-Shirts (9), Bags (7), Hoodies (2)
-  const tracksuits = getProductsByCategoryAndBrand('tracksuits', 'trapstar').slice(0, 8)
-  const jackets = getProductsByCategoryAndBrand('jackets', 'trapstar').slice(0, 8)
-  const shorts = getProductsByCategoryAndBrand('shorts', 'trapstar').slice(0, 8)
-  const tshirts = getProductsByCategoryAndBrand('t-shirts', 'trapstar').slice(0, 8)
-  const bags = getProductsByCategoryAndBrand('bags', 'trapstar').slice(0, 8)
-  const hoodies = getProductsByCategoryAndBrand('hoodies', 'trapstar').slice(0, 8)
+  // Get Essentials products by category for homepage sections (ordered by product count)
+  const hoodies = getProductsByCategoryAndBrand('hoodies', 'essentials').slice(0, 8)
+  const tshirts = getProductsByCategoryAndBrand('t-shirts', 'essentials').slice(0, 8)
+  const jackets = getProductsByCategoryAndBrand('jackets', 'essentials').slice(0, 8)
+  const sweatshirts = getProductsByCategoryAndBrand('sweatshirts', 'essentials').slice(0, 8)
+  const tracksuits = getProductsByCategoryAndBrand('tracksuits', 'essentials').slice(0, 8)
+  const sweatpants = getProductsByCategoryAndBrand('sweatpants', 'essentials').slice(0, 8)
+  const shorts = getProductsByCategoryAndBrand('shorts', 'essentials').slice(0, 8)
 
   return (
     <>
@@ -19,8 +19,8 @@ export default function Home() {
       <section className="relative w-full bg-black border-b border-gray-900">
         <div className="relative w-full" style={{ height: '70vh', minHeight: '500px' }}>
           <Image
-            src="/cc.jpg"
-            alt="Trapstar Official Hero"
+            src="/Essentials.jpeg"
+            alt="Essentials Official Hero"
             fill
             className="object-contain"
             priority
@@ -29,61 +29,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Category Sections - Only Trapstar Categories */}
+      {/* Category Sections - Essentials Categories */}
       <div id="collections" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        {/* Tracksuits - 31 products */}
-        {tracksuits.length > 0 && (
+        {/* Hoodies - 42 products */}
+        {hoodies.length > 0 && (
           <section className="mb-16 md:mb-24">
             <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar Tracksuits</h2>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Hoodies</h2>
               <div className="max-w-4xl">
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  Trapstar tracksuits are popular because they are both fashion-forward and wearable because they combine premium comfort with bold streetwear design. The brand's edgy graphics, quality materials, and limited releases make them a must-have for streetwear.
+                  Essentials hoodies are known for their blend of premium quality, striking graphics, and streetwear credibility. A badge of style for those who appreciate bold design and exceptional craftsmanship.
                 </p>
               </div>
             </div>
-            <ProductGrid products={tracksuits} />
+            <ProductGrid products={hoodies} />
           </section>
         )}
 
-        {/* Jackets - 27 products */}
-        {jackets.length > 0 && (
-          <section className="mb-16 md:mb-24">
-            <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar Jackets</h2>
-              <div className="max-w-4xl">
-                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  Trapstar jackets combine premium materials with bold streetwear designs. From leather jackets to track jackets, each piece features the brand's signature aesthetic and quality craftsmanship.
-                </p>
-              </div>
-            </div>
-            <ProductGrid products={jackets} />
-          </section>
-        )}
-
-        {/* Shorts - 21 products */}
-        {shorts.length > 0 && (
-          <section className="mb-16 md:mb-24">
-            <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar Shorts</h2>
-              <div className="max-w-4xl">
-                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  Trapstar Shorts are athletic shorts of high quality made with streetwear culture in mind. They frequently have eye-catching graphic prints, high-quality materials, and a distinct relaxed fit that will make you stand out.
-                </p>
-              </div>
-            </div>
-            <ProductGrid products={shorts} />
-          </section>
-        )}
-
-        {/* T-Shirts - 9 products */}
+        {/* T-Shirts - 33 products */}
         {tshirts.length > 0 && (
           <section className="mb-16 md:mb-24">
             <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar T-Shirts</h2>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials T-Shirts</h2>
               <div className="max-w-4xl">
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  Trapstar is not an established brand. The loudness of their T-shirts is not childish. The designs carry some real weight—metaphorically and physically. It is not thin cotton that deteriorates after two washes.
+                  Essentials T-shirts feature bold graphics and premium quality materials. The designs carry real weight—metaphorically and physically. Made with durable cotton that stands the test of time.
                 </p>
               </div>
             </div>
@@ -91,50 +61,93 @@ export default function Home() {
           </section>
         )}
 
-        {/* Bags - 7 products */}
-        {bags.length > 0 && (
+        {/* Jackets - 20 products */}
+        {jackets.length > 0 && (
           <section className="mb-16 md:mb-24">
             <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar Bags</h2>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Jackets</h2>
               <div className="max-w-4xl">
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  Complete your streetwear look with Trapstar bags. From cross-body bags to backpacks, each piece features the brand's iconic logos and premium quality.
+                  Essentials jackets combine premium materials with bold streetwear designs. From leather jackets to track jackets, each piece features the brand's signature aesthetic and quality craftsmanship.
                 </p>
               </div>
             </div>
-            <ProductGrid products={bags} />
+            <ProductGrid products={jackets} />
           </section>
         )}
 
-        {/* Hoodies - 2 products */}
-        {hoodies.length > 0 && (
+        {/* Sweatshirts - 15 products */}
+        {sweatshirts.length > 0 && (
           <section className="mb-16 md:mb-24">
             <div className="mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Trapstar Hoodies</h2>
-              <div className="max-w-4xl space-y-4">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Sweatshirts</h2>
+              <div className="max-w-4xl">
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-                  The Trapstar hoodie's popularity comes from its blend of premium quality, striking graphics, and streetwear credibility. It is a badge of style for the brave, as celebrities, rappers, and influencers have been spotted wearing these distinctive pieces.
-                </p>
-                <p className="text-gray-400 text-base md:text-lg leading-relaxed">
-                  When you're hunting for a hoodie, quality is king. Trapstar hoodies have been making waves, but are they really worth the hype? I've taken a deep dive into what makes these hoodies tick. They cost more than your average hoodie, but the craftsmanship and design speak for themselves.
+                  Essentials sweatshirts offer comfort and style with premium materials and distinctive designs. Perfect for layering or wearing on their own, these crewneck sweatshirts are a wardrobe essential.
                 </p>
               </div>
             </div>
-            <ProductGrid products={hoodies} />
+            <ProductGrid products={sweatshirts} />
           </section>
         )}
+
+        {/* Tracksuits - 13 products */}
+        {tracksuits.length > 0 && (
+          <section className="mb-16 md:mb-24">
+            <div className="mb-8 md:mb-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Tracksuits</h2>
+              <div className="max-w-4xl">
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                  Essentials tracksuits combine premium comfort with bold streetwear design. The brand's edgy graphics, quality materials, and limited releases make them a must-have for streetwear enthusiasts.
+                </p>
+              </div>
+            </div>
+            <ProductGrid products={tracksuits} />
+          </section>
+        )}
+
+        {/* Sweatpants - 10 products */}
+        {sweatpants.length > 0 && (
+          <section className="mb-16 md:mb-24">
+            <div className="mb-8 md:mb-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Sweatpants</h2>
+              <div className="max-w-4xl">
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                  Essentials sweatpants combine comfort, toughness, and edge in a way that fits today's culture. Consistent design, quality materials, and that signature Essentials aesthetic make these sweatpants more than just loungewear—they're a statement piece.
+                </p>
+              </div>
+            </div>
+            <ProductGrid products={sweatpants} />
+          </section>
+        )}
+
+        {/* Shorts - 9 products */}
+        {shorts.length > 0 && (
+          <section className="mb-16 md:mb-24">
+            <div className="mb-8 md:mb-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Essentials Shorts</h2>
+              <div className="max-w-4xl">
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                  Essentials shorts are made with streetwear culture in mind. They feature eye-catching graphic prints, high-quality materials, and a distinct relaxed fit that will make you stand out.
+                </p>
+              </div>
+            </div>
+            <ProductGrid products={shorts} />
+          </section>
+        )}
+
       </div>
 
-      {/* Trapstar Overview Section - After Products */}
+      {/* Essentials Overview Section - After Products */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <section className="mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">Trapstar Overview</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">Essentials Overview</h2>
           <div className="text-gray-300 space-y-5 md:space-y-6 max-w-4xl text-base md:text-lg leading-relaxed">
             <p>
-              The Streetwear Brand Taking Over Your Wardrobe Is Trapstar. Trapstar is probably showing up everywhere if you've been browsing fashion websites or Instagram in recent times. The company does not dominate the streetwear scene by accident—it's built on a foundation of bold design, premium quality, and a unique aesthetic that speaks to a generation looking for something different.
+              Essentials is a streetwear brand that has been making waves in the fashion industry. The brand combines bold designs with premium quality, creating pieces that stand out in the streetwear scene.
             </p>
             <p>
-              Trapstar is an alternative streetwear brand mixing dark, rebellious cyberpunk and Christian-inspired themes. Founded in 2020 by Sean Holland and Joseph Pendleton, it's about "finding stars in hell".
+              Known for their distinctive aesthetic and high-quality materials, Essentials offers a range of products including jackets, hoodies, t-shirts, shorts, and accessories. Each piece reflects the brand's commitment to style and quality.
             </p>
           </div>
         </section>
