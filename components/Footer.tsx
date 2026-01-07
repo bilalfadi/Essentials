@@ -96,6 +96,26 @@ export default function Footer() {
                   About Us
                 </Link>
               </li>
+              <li>
+                <Link href="/authenticity-service" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Authenticity Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/size-guides" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Size Guides
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/customer-care" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Customer Care
+                </Link>
+              </li>
             </ul>
           </div>
 

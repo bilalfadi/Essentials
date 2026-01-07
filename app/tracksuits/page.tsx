@@ -1,4 +1,4 @@
-import { getProductsByCategory, getProductsByCategoryAndBrand, getAllProducts } from '@/lib/products'
+import { getProductsByCategoryAndBrand, getProductsByCategoryAndBrandSync } from '@/lib/products'
 import ProductGrid from '@/components/ProductGrid'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -28,9 +28,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function CategoryPage() {
-  // Get only Essentials products
-  const essentialsProducts = getProductsByCategoryAndBrand(category, 'essentials')
+export default async function CategoryPage() {
+  // Get only Essentials products - Try WooCommerce first, fallback to local data
+  const essentialsProducts = await getProductsByCategoryAndBrand(category, 'essentials') || getProductsByCategoryAndBrandSync(category, 'essentials')
   const allProducts = essentialsProducts
 
   // Category-specific descriptions for Essentials

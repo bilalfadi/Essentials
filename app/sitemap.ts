@@ -1,10 +1,10 @@
 import { MetadataRoute } from 'next'
-import { getAllProducts } from '@/lib/products'
+import { getAllProducts, getAllProductsSync } from '@/lib/products'
 
 // Only categories used in navigation
 const validCategories = ['hoodies', 't-shirts', 'jackets', 'sweatshirts', 'tracksuits', 'sweatpants', 'shorts']
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://essentialsjacket.com'
   
   // Static pages
@@ -49,8 +49,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
-  // Product pages
-  const products = getAllProducts()
+  // Product pages - Try WooCommerce first, fallback to local data
+  const products = await getAllProducts() || getAllProductsSync()
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${baseUrl}/${product.slug}`,
     lastModified: new Date(),

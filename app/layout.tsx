@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { CurrencyProvider } from '@/contexts/CurrencyContext'
 
 export const metadata: Metadata = {
   title: 'Essentials Official - Premium Streetwear | Essentials Jacket',
@@ -46,11 +47,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <CurrencyProvider>
+          <Navbar />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </CurrencyProvider>
       </body>
     </html>
   )

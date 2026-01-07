@@ -1,8 +1,10 @@
-import { getProductBySlug, getProductsByCategory, getAllProducts } from '@/lib/products'
+import { getProductBySlug, getProductBySlugSync, getProductsByCategory, getProductsByCategorySync, getAllProducts } from '@/lib/products'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ProductGrid from '@/components/ProductGrid'
 import ProductDetailTabs from '@/components/ProductDetailTabs'
+import ProductPrice from '@/components/ProductPrice'
+import ProductBuySection from '@/components/ProductBuySection'
 import type { Metadata } from 'next'
 
 interface ProductPageProps {
@@ -21,7 +23,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return {}
   }
   
-  const product = getProductBySlug(params.slug)
+  // Try to fetch from WooCommerce, fallback to local data
+  const product = await getProductBySlug(params.slug) || getProductBySlugSync(params.slug)
   
   if (!product) {
     return {}
@@ -29,7 +32,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   const title = `${product.title} - Essentials Official | Premium Streetwear`
   const description = product.description || `${product.title} from Essentials Official. Premium quality streetwear with bold designs.`
-  const imageUrl = product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`
+  const imageUrl = (product.image && typeof product.image === 'string' && product.image.startsWith('http')) 
+    ? product.image 
+    : (product.image && typeof product.image === 'string') 
+      ? `https://essentialsjacket.com${product.image}` 
+      : ''
 
   return {
     title: title,
@@ -60,13 +67,14 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   }
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params }: ProductPageProps) {
   // If slug is a category or reserved route, show 404
   if (validCategories.includes(params.slug) || params.slug.startsWith('category/')) {
     notFound()
   }
   
-  const product = getProductBySlug(params.slug)
+  // Try to fetch from WooCommerce, fallback to local data
+  const product = await getProductBySlug(params.slug) || getProductBySlugSync(params.slug)
 
   if (!product) {
     notFound()
@@ -86,9 +94,13 @@ export default function ProductPage({ params }: ProductPageProps) {
   const peopleWatching = 3 + (product.id % 18) // Random between 3-20
 
   // Get related products (same category, exclude current product)
-  const relatedProducts = getProductsByCategory(product.category)
+  const relatedProductsList = await getProductsByCategory(product.category) || getProductsByCategorySync(product.category)
+  const relatedProducts = relatedProductsList
     .filter(p => p.id !== product.id)
     .slice(0, 8)
+
+  // WooCommerce external URL for Buy Now button
+  const buyNowUrl = product.woocommerceUrl || `https://payment.essentialsjacket.com/product/${product.slug}/`
 
   // Structured data for product page
   const productSchema = {
@@ -96,7 +108,11 @@ export default function ProductPage({ params }: ProductPageProps) {
     '@type': 'Product',
     name: product.title,
     description: product.description,
-    image: product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`,
+    image: (product.image && typeof product.image === 'string' && product.image.startsWith('http')) 
+      ? product.image 
+      : (product.image && typeof product.image === 'string') 
+        ? `https://essentialsjacket.com${product.image}` 
+        : '',
     brand: {
       '@type': 'Brand',
       name: 'Essentials'
@@ -153,25 +169,7 @@ export default function ProductPage({ params }: ProductPageProps) {
           
           {/* Price with Discount Badge */}
           <div className="mb-4">
-            {displayDiscountPrice ? (
-              <div className="flex items-center space-x-3 mb-2">
-                <span className="text-2xl md:text-3xl font-bold text-white">${displayDiscountPrice.toFixed(2)}</span>
-                {discountPercent && (
-                  <span className="bg-red-600 text-white px-2 py-1 text-xs font-bold">
-                    -{discountPercent}%
-                  </span>
-                )}
-              </div>
-            ) : (
-              <span className="text-2xl md:text-3xl font-bold text-white">${displayPrice.toFixed(2)}</span>
-            )}
-            {displayDiscountPrice && displayPrice > 0 && (
-              <div className="text-gray-500 text-sm">
-                <span className="line-through">${displayPrice.toFixed(2)}</span>
-                <span className="ml-2">Original price was: ${displayPrice.toFixed(2)}.</span>
-                <span className="text-white ml-1">${displayDiscountPrice.toFixed(2)} Current price is: ${displayDiscountPrice.toFixed(2)}.</span>
-              </div>
-            )}
+            <ProductPrice price={displayPrice} discountPrice={displayDiscountPrice} />
           </div>
 
           {/* Social Proof */}
@@ -179,24 +177,8 @@ export default function ProductPage({ params }: ProductPageProps) {
             <p>{itemsSold} Items sold in last 3 minutes</p>
           </div>
 
-          {/* Size Selector */}
-          <div className="mb-6">
-            <label className="block text-white font-medium mb-2">
-              Select Size <span className="text-red-500">*</span>
-            </label>
-            <select className="w-full bg-gray-900 border border-gray-700 text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white">
-              <option>Select an option...</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-            </select>
-          </div>
-
-          {/* Buy Now Button */}
-          <button className="bg-white text-black px-8 py-4 font-semibold hover:bg-gray-200 transition-colors duration-200 mb-4 w-full">
-            Buy Now
-          </button>
+          {/* Size Selector and Buy Now Button */}
+          <ProductBuySection productSlug={product.slug} />
 
           {/* Social Proof */}
           <div className="mb-6 text-sm text-gray-400">
@@ -244,7 +226,8 @@ export default function ProductPage({ params }: ProductPageProps) {
 
 // Generate static params for all products
 export async function generateStaticParams() {
-  const products = getAllProducts()
+  // Try WooCommerce first, fallback to local data
+  const products = await getAllProducts() || []
   // Filter out any products whose slug matches a category name
   return products
     .filter((product) => !validCategories.includes(product.slug))

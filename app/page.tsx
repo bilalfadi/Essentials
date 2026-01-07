@@ -1,4 +1,4 @@
-import { getProductsByCategoryAndBrand } from '@/lib/products'
+import { getProductsByCategoryAndBrand, getProductsByCategoryAndBrandSync } from '@/lib/products'
 import ProductGrid from '@/components/ProductGrid'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,15 +32,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Home() {
+export default async function Home() {
   // Get Essentials products by category for homepage sections (ordered by product count)
-  const hoodies = getProductsByCategoryAndBrand('hoodies', 'essentials').slice(0, 8)
-  const tshirts = getProductsByCategoryAndBrand('t-shirts', 'essentials').slice(0, 8)
-  const jackets = getProductsByCategoryAndBrand('jackets', 'essentials').slice(0, 8)
-  const sweatshirts = getProductsByCategoryAndBrand('sweatshirts', 'essentials').slice(0, 8)
-  const tracksuits = getProductsByCategoryAndBrand('tracksuits', 'essentials').slice(0, 8)
-  const sweatpants = getProductsByCategoryAndBrand('sweatpants', 'essentials').slice(0, 8)
-  const shorts = getProductsByCategoryAndBrand('shorts', 'essentials').slice(0, 8)
+  // Try WooCommerce first, fallback to local data
+  const hoodies = (await getProductsByCategoryAndBrand('hoodies', 'essentials') || []).slice(0, 8)
+  const tshirts = (await getProductsByCategoryAndBrand('t-shirts', 'essentials') || []).slice(0, 8)
+  const jackets = (await getProductsByCategoryAndBrand('jackets', 'essentials') || []).slice(0, 8)
+  const sweatshirts = (await getProductsByCategoryAndBrand('sweatshirts', 'essentials') || []).slice(0, 8)
+  const tracksuits = (await getProductsByCategoryAndBrand('tracksuits', 'essentials') || []).slice(0, 8)
+  const sweatpants = (await getProductsByCategoryAndBrand('sweatpants', 'essentials') || []).slice(0, 8)
+  const shorts = (await getProductsByCategoryAndBrand('shorts', 'essentials') || []).slice(0, 8)
 
   // Structured data for homepage
   const websiteSchema = {

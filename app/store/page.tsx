@@ -1,4 +1,4 @@
-import { getAllProducts } from '@/lib/products'
+import { getAllProducts, getAllProductsSync } from '@/lib/products'
 import ProductGrid from '@/components/ProductGrid'
 import type { Metadata } from 'next'
 
@@ -18,8 +18,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function StorePage() {
-  const allProducts = getAllProducts()
+export default async function StorePage() {
+  // Try WooCommerce first, fallback to local data
+  const allProducts = await getAllProducts() || getAllProductsSync()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

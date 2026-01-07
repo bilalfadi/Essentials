@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useCurrencyContext } from '@/contexts/CurrencyContext'
 
 interface Product {
   id: number
@@ -19,6 +20,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { formatPrice } = useCurrencyContext();
+  
   // Ensure prices are valid numbers
   const displayPrice = product.price || 0
   const displayDiscountPrice = product.discountPrice || null
@@ -61,11 +64,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center space-x-2">
             {displayDiscountPrice ? (
               <>
-                <span className="text-white font-semibold text-sm md:text-base">${displayDiscountPrice.toFixed(2)}</span>
-                <span className="text-gray-500 line-through text-xs md:text-sm">${displayPrice.toFixed(2)}</span>
+                <span className="text-white font-semibold text-sm md:text-base">{formatPrice(displayDiscountPrice)}</span>
+                <span className="text-gray-500 line-through text-xs md:text-sm">{formatPrice(displayPrice)}</span>
               </>
             ) : (
-              <span className="text-white font-semibold text-sm md:text-base">${displayPrice.toFixed(2)}</span>
+              <span className="text-white font-semibold text-sm md:text-base">{formatPrice(displayPrice)}</span>
             )}
           </div>
         </div>

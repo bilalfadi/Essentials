@@ -3,10 +3,13 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import CurrencySelector from './CurrencySelector'
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false)
+  const [isMobilePagesOpen, setIsMobilePagesOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
 
@@ -20,6 +23,20 @@ export default function Navbar() {
     { name: 'Tracksuits', href: '/tracksuits' },
     { name: 'Sweatpants', href: '/sweatpants' },
     { name: 'Shorts', href: '/shorts' },
+  ]
+
+  const pagesLinks = [
+    { name: 'All Pages', href: '/pages' },
+    { name: 'Authenticity Service', href: '/authenticity-service' },
+    { name: 'Size Guides', href: '/size-guides' },
+    { name: 'FAQ', href: '/faq' },
+    { name: 'Customer Care', href: '/customer-care' },
+    { name: 'About Us', href: '/about-us' },
+    { name: 'Contact Us', href: '/contact-us' },
+    { name: 'Shipping Policy', href: '/shipping-policy' },
+    { name: 'Return & Exchange', href: '/return-exchange' },
+    { name: 'Refund & Cancellation', href: '/refund-cancellation' },
+    { name: 'Privacy Policy', href: '/privacy-policy' },
   ]
 
   return (
@@ -44,10 +61,47 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Pages Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsPagesDropdownOpen(true)}
+              onMouseLeave={() => setIsPagesDropdownOpen(false)}
+            >
+              <Link
+                href="/pages"
+                className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium flex items-center"
+              >
+                Pages
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+              
+              {isPagesDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-black border border-gray-800 rounded-lg shadow-lg py-2 z-50">
+                  {pagesLinks.map((page) => (
+                    <Link
+                      key={page.name}
+                      href={page.href}
+                      className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-900 transition-colors"
+                      onClick={() => setIsPagesDropdownOpen(false)}
+                    >
+                      {page.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4">
+            {/* Currency Selector */}
+            <div className="hidden md:block">
+              <CurrencySelector />
+            </div>
+            
             {/* Search */}
             <div className="relative">
               {isSearchOpen ? (
@@ -141,6 +195,47 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              
+              {/* Currency Selector - Mobile */}
+              <div className="py-2">
+                <CurrencySelector />
+              </div>
+              
+              {/* Mobile Pages Dropdown */}
+              <div>
+                <button
+                  onClick={() => setIsMobilePagesOpen(!isMobilePagesOpen)}
+                  className="w-full flex items-center justify-between text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium py-2"
+                >
+                  Pages
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${isMobilePagesOpen ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {isMobilePagesOpen && (
+                  <div className="pl-4 mt-2 space-y-2 border-l border-gray-800">
+                    {pagesLinks.map((page) => (
+                      <Link
+                        key={page.name}
+                        href={page.href}
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setIsMobilePagesOpen(false)
+                        }}
+                        className="block text-gray-400 hover:text-white transition-colors duration-200 text-sm py-2"
+                      >
+                        {page.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
