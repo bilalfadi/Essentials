@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CurrencySelector from './CurrencySelector'
@@ -45,8 +46,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="text-white text-xl font-semibold">
-              Essentials Official
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/fear-of-god-logo.svg"
+                alt="Fear of God"
+                width={150}
+                height={30}
+                className="h-8 w-auto"
+                priority
+              />
             </Link>
           </div>
 
