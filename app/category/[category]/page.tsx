@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 
-  const products = getProductsByCategoryAndBrand(category, 'essentials')
+  const products = await getProductsByCategoryAndBrand(category, 'essentials') || []
   const description = `Shop ${categoryName} from Essentials Official. Premium quality ${categoryName.toLowerCase()} with bold streetwear designs. ${products.length} products available.`
 
   return {
@@ -56,7 +56,7 @@ export async function generateStaticParams() {
   }))
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   // Use category directly from params (already matches URL)
   const category = params.category
 
@@ -65,7 +65,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   }
 
   // Get only Essentials products
-  const essentialsProducts = getProductsByCategoryAndBrand(category, 'essentials')
+  const essentialsProducts = await getProductsByCategoryAndBrand(category, 'essentials') || []
   const allProducts = essentialsProducts
 
   // Format category name for display
@@ -113,7 +113,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           '@type': 'Product',
           name: product.title,
           url: `https://essentialsjacket.com/${product.slug}`,
-          image: product.image.startsWith('http') ? product.image : `https://essentialsjacket.com${product.image}`,
+          image: (product.image && typeof product.image === 'string' && product.image.startsWith('http')) ? product.image : (product.image && typeof product.image === 'string') ? `https://essentialsjacket.com${product.image}` : '',
           brand: {
             '@type': 'Brand',
             name: 'Essentials'

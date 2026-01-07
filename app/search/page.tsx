@@ -12,12 +12,15 @@ function SearchContent() {
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    if (query) {
-      const results = searchProducts(query)
-      setProducts(results)
-    } else {
-      setProducts([])
+    const fetchResults = async () => {
+      if (query) {
+        const results = await searchProducts(query)
+        setProducts(results || [])
+      } else {
+        setProducts([])
+      }
     }
+    fetchResults()
   }, [query])
 
   return (

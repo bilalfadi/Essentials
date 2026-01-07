@@ -8,7 +8,6 @@ interface CurrencyContextType {
   setCurrency: (currency: string) => void;
   convertPrice: (usdPrice: number) => number;
   formatPrice: (usdPrice: number) => string;
-  isDetecting: boolean;
   currencies: Record<string, { code: string; symbol: string; name: string }>;
 }
 
