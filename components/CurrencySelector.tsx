@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { COUNTRIES, getCurrencyForCountry } from '@/lib/currency';
 
 interface CurrencyInfo {
   code: string;
@@ -98,23 +99,37 @@ const EXCHANGE_RATES: Record<string, number> = {
 };
 
 const STORAGE_KEY = 'selected_currency';
+const STORAGE_KEY_COUNTRY = 'selected_country';
 const DEFAULT_CURRENCY = 'USD';
+const DEFAULT_COUNTRY = 'US';
 
 export function useCurrency() {
-  const [currency, setCurrency] = useState<string>(DEFAULT_CURRENCY);
+  const [currency, setCurrencyState] = useState<string>(DEFAULT_CURRENCY);
 
-  // Load saved currency on mount
+  // Load saved currency on mount (client-side only to prevent hydration errors)
   useEffect(() => {
-    const savedCurrency = localStorage.getItem(STORAGE_KEY);
-    if (savedCurrency && CURRENCIES[savedCurrency]) {
-      setCurrency(savedCurrency);
+    if (typeof window !== 'undefined') {
+      const savedCurrency = localStorage.getItem(STORAGE_KEY);
+      if (savedCurrency && CURRENCIES[savedCurrency]) {
+        setCurrencyState(savedCurrency);
+      }
     }
   }, []);
 
-  const setCurrencyWithSave = (newCurrency: string) => {
+  // Set currency with saving to localStorage (for manual selection)
+  const setCurrency = (newCurrency: string) => {
     if (CURRENCIES[newCurrency]) {
-      setCurrency(newCurrency);
-      localStorage.setItem(STORAGE_KEY, newCurrency);
+      setCurrencyState(newCurrency);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, newCurrency);
+      }
+    }
+  };
+
+  // Set currency without saving to localStorage (for auto-detection)
+  const setCurrencyWithoutSave = (newCurrency: string) => {
+    if (CURRENCIES[newCurrency]) {
+      setCurrencyState(newCurrency);
     }
   };
 
@@ -141,21 +156,184 @@ export function useCurrency() {
 
   return {
     currency,
-    setCurrency: setCurrencyWithSave,
+    setCurrency,
+    setCurrencyWithoutSave,
     convertPrice,
     formatPrice,
     currencies: CURRENCIES,
   };
 }
 
+/**
+ * Detect country from IP address using multiple client-side APIs
+ */
+async function detectCountryFromIP(): Promise<string> {
+  // Client-side APIs to try
+  const apis = [
+    { url: 'https://ipapi.co/json/', key: 'country_code' },
+    { url: 'https://ip-api.com/json/?fields=status,countryCode', key: 'countryCode' },
+    { url: 'https://geojs.io/geo.json', key: 'country' },
+    { url: 'https://api.country.is', key: 'country' },
+  ];
+
+  // Try each API sequentially
+  for (const api of apis) {
+    try {
+      const response = await fetch(api.url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        continue;
+      }
+
+      const data = await response.json();
+      const countryCode = data[api.key];
+
+      if (countryCode && typeof countryCode === 'string') {
+        const upperCode = countryCode.toUpperCase();
+        console.log(`Country detected via ${api.url}: ${upperCode}`);
+        return upperCode;
+      }
+    } catch (error) {
+      console.log(`API ${api.url} failed:`, error);
+      continue;
+    }
+  }
+
+  // If all client-side APIs fail or return 'US', try server-side API
+  let detectedCountry = 'US';
+  
+  try {
+    const response = await fetch('/api/detect-country');
+    if (response.ok) {
+      const data = await response.json();
+      if (data.country && data.country !== 'US') {
+        detectedCountry = data.country.toUpperCase();
+        console.log(`Country detected via server API: ${detectedCountry}`);
+      }
+    }
+  } catch (error) {
+    console.log('Server-side API failed:', error);
+  }
+
+  return detectedCountry;
+}
+
 export default function CurrencySelector() {
-  const { currency, setCurrency, currencies } = useCurrency();
+  const { currency, setCurrency, setCurrencyWithoutSave, currencies } = useCurrency();
+  const [selectedCountry, setSelectedCountry] = useState<string>(DEFAULT_COUNTRY);
+  const [mounted, setMounted] = useState(false);
+  const hasAutoDetected = useRef(false);
+
+  // Set mounted state on client-side only
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Auto-detect country and currency on mount (client-side only)
+  useEffect(() => {
+    if (!mounted || typeof window === 'undefined') return;
+
+    // Only auto-detect if user hasn't manually selected a country
+    const savedCountry = localStorage.getItem(STORAGE_KEY_COUNTRY);
+    
+    if (savedCountry) {
+      // User has manually selected a country, use that
+      setSelectedCountry(savedCountry);
+      const savedCurrency = getCurrencyForCountry(savedCountry);
+      if (savedCurrency && CURRENCIES[savedCurrency]) {
+        setCurrency(savedCurrency);
+      }
+      return;
+    }
+
+    // Auto-detect country from IP
+    if (!hasAutoDetected.current) {
+      hasAutoDetected.current = true;
+      
+      detectCountryFromIP().then((detectedCountry) => {
+        const country = COUNTRIES.find(c => c.code === detectedCountry);
+        
+        if (country) {
+          setSelectedCountry(detectedCountry);
+          const detectedCurrency = country.currency;
+          
+          // Set currency without saving to localStorage (auto-detection)
+          if (CURRENCIES[detectedCurrency]) {
+            setCurrencyWithoutSave(detectedCurrency);
+            
+            // Dispatch currencyChanged event for other components
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('currencyChanged', {
+                detail: {
+                  currency: detectedCurrency,
+                  countryCode: detectedCountry,
+                },
+              }));
+            }
+            
+            console.log(`Auto-detected: ${detectedCountry} -> ${detectedCurrency}`);
+          }
+        }
+      }).catch((error) => {
+        console.error('Country detection failed:', error);
+      });
+    }
+  }, [mounted, setCurrency, setCurrencyWithoutSave]);
+
+  // Listen to currencyChanged events from other sources (client-side only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleCurrencyChange = (event: CustomEvent) => {
+      const { currency: newCurrency, countryCode } = event.detail;
+      if (newCurrency && CURRENCIES[newCurrency]) {
+        setCurrency(newCurrency);
+        if (countryCode) {
+          setSelectedCountry(countryCode);
+        }
+      }
+    };
+
+    window.addEventListener('currencyChanged', handleCurrencyChange as EventListener);
+    return () => {
+      window.removeEventListener('currencyChanged', handleCurrencyChange as EventListener);
+    };
+  }, [setCurrency]);
+
+  // Handle manual currency selection
+  const handleCurrencySelect = (currencyCode: string) => {
+    setCurrency(currencyCode);
+    
+    // Find country for this currency
+    const country = COUNTRIES.find(c => c.currency === currencyCode);
+    if (country) {
+      setSelectedCountry(country.code);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY_COUNTRY, country.code);
+      }
+    }
+    
+    // Dispatch currencyChanged event
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('currencyChanged', {
+        detail: {
+          currency: currencyCode,
+          countryCode: country?.code || selectedCountry,
+        },
+      }));
+    }
+  };
 
   return (
     <div className="relative">
       <select
         value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
+        onChange={(e) => handleCurrencySelect(e.target.value)}
         className="bg-gray-900 border border-gray-700 text-white px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-white text-xs"
       >
         {Object.values(currencies).map((curr) => (
@@ -167,4 +345,3 @@ export default function CurrencySelector() {
     </div>
   );
 }
-

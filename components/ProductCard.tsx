@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useCurrencyContext } from '@/contexts/CurrencyContext'
 
@@ -21,6 +22,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { formatPrice } = useCurrencyContext();
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   
   // Ensure prices are valid numbers
   const displayPrice = product.price || 0
@@ -30,6 +32,19 @@ export default function ProductCard({ product }: ProductCardProps) {
   const discountPercent = displayDiscountPrice && displayPrice > 0
     ? Math.round(((displayPrice - displayDiscountPrice) / displayPrice) * 100)
     : null
+
+  // Listen to currencyChanged events for automatic updates
+  useEffect(() => {
+    const handleCurrencyChange = () => {
+      // Force re-render by updating trigger
+      setUpdateTrigger(prev => prev + 1);
+    };
+
+    window.addEventListener('currencyChanged', handleCurrencyChange);
+    return () => {
+      window.removeEventListener('currencyChanged', handleCurrencyChange);
+    };
+  }, []);
 
   return (
     <Link href={`/${product.slug}`} className="group block">
