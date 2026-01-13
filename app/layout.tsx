@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Essentials Official - Premium Streetwear | Essentials Jacket',
   description: 'Essentials Official - Premium Streetwear Collection. Shop Essentials hoodies, t-shirts, jackets, tracksuits, and more at essentialsjacket.com',
   metadataBase: new URL('https://essentialsjacket.com'),
+  verification: {
+    google: 'oqWGYYR64FnVTD73sYfRzhbcmib_ANpX11ZDFdYgg5Q',
+  },
   alternates: {
     canonical: 'https://essentialsjacket.com/',
   },
