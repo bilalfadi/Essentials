@@ -8,8 +8,8 @@ This project now integrates with WooCommerce to:
 
 ## WooCommerce Credentials
 - **URL**: `https://payment.essentialsjacket.com`
-- **Consumer Key**: `ck_2a5b631771504e2f65c279f2049dfc564909f553`
-- **Consumer Secret**: `cs_46d1a9dc72f66b9a64670da2cdab4e548cc539c7`
+- **Consumer Key**: `ck_c8da2c7777f941db2d1bbc9473eb123b3d7eaf0c`
+- **Consumer Secret**: `cs_be0129200d5d22f57290ec5d58d3ffe842415dbe`
 
 ## Import Products to WooCommerce
 
